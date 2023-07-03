@@ -138,14 +138,6 @@ class ReviewsTwoGis:
             class_parent_rating = name_elem.find_element(by=By.XPATH, value='./../../../..') \
                 .get_attribute('class')
 
-            text_script = ("return document.querySelectorAll"
-                           "('." + class_parent_rating + "')"
-                           "[" + str(b) + "].children"
-                           ".item(document.querySelectorAll"
-                           "('._o7qbud')[0].children.length - 1)"
-                           ".children.item(0).children.item(0)"
-                           ".querySelectorAll('span').length")
-
             rating = self.browser.driver.execute_script("return document.querySelectorAll"
                                                         "('." + class_parent_rating + "')"
                                                         "[" + str(b - 1) + "].children"
@@ -157,7 +149,27 @@ class ReviewsTwoGis:
             print(rating)
 
             # work with response
+            length_response = self.browser.driver.execute_script("return document.querySelectorAll"
+                                                                 "('." + class_review + "')"
+                                                                 "[" + str(b - 1) + "].children.item(2)"
+                                                                 ".children.length")
 
+            if int(length_response) > 2:
+                company_response = self.browser.driver.execute_script("return document.querySelectorAll"
+                                                                      "('." + class_review + "')"
+                                                                      "[" + str(b - 1) + "].children"
+                                                                      ".item(2).children[2]"
+                                                                      ".querySelector('span').innerText")
+
+                text_response = self.browser.driver.execute_script("return document.querySelectorAll"
+                                                                   "('." + class_review + "')"
+                                                                   "[" + str(b - 1) + "].children"
+                                                                   ".item(2).children.item(2)"
+                                                                   ".children.item(0).children"
+                                                                   ".item(2).innerText")
+
+                print('название компании: ' + company_response)
+                print('текст ответа: ' + text_response)
 
             b += 1
 
