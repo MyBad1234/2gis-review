@@ -16,11 +16,12 @@ class Browser:
     def __init__(self, mode: str):
         if mode == 'window':
             options = webdriver.ChromeOptions()
-            options.add_argument('--headless')
-            options.add_argument('--no-sandbox')
-            options.add_argument("--disable-gpu")
 
-            self.driver = webdriver.Firefox()
+            # set proxy
+            # proxy_str = proxy.get('ip') + ':' + proxy.get('port')
+            # options.add_argument('--proxy-server=%s' % proxy_str)
+
+            self.driver = webdriver.Chrome(options=options)
             self.in_windows = True
         elif mode == 'docker':
             # set options for browser in background
@@ -88,6 +89,7 @@ class ReviewsTwoGis:
     def scroll_reviews(self):
         """scroll all reviews for get it"""
 
+        # scroll to start
         scroll_script = ("let a; for (let i of document.querySelectorAll('a')) {"
                          " if (i.innerText.slice(0, 6) "
                          "=== 'Отзывы') { a = i; }}"
@@ -100,12 +102,24 @@ class ReviewsTwoGis:
                          "if (scroll_elem.scrollHeight !== height) {"
                          "height = scroll_elem.scrollHeight;" 
                          "setTimeout(scrollThis, 1000); }}"
-                         "setTimeout(scrollThis, 1000); ")
+                         "setTimeout(scrollThis, 1000);")
 
         self.browser.driver.execute_script(scroll_script)
 
-    def get_reviews(self, class_review):
+        time.sleep(3)
+
+        # scroll to the end
+        scroll_script = ("let a; for (let i of document.querySelectorAll('a')) {"
+                         " if (i.innerText.slice(0, 6) "
+                         "=== 'Отзывы') { a = i; }} "
+                         "a.scrollIntoView()")
+
+        self.browser.driver.execute_script(scroll_script)
+
+    def get_reviews(self, class_review, repeat=False):
         """print all reviews"""
+
+        reviews = []
 
         tags = self.browser.driver.find_elements(
             by=By.CSS_SELECTOR, value=('.' + class_review)
@@ -113,8 +127,16 @@ class ReviewsTwoGis:
 
         b = 1
         for i in tags:
+            # control repeat or no
+            if repeat and (i == 31):
+                break
+
             a = i.find_element(by=By.CSS_SELECTOR, value='a')
-            print('\n\n' + str(b) + '. ' + a.text)
+            review_text = a.text
+
+            review_text = self.browser.driver.execute_script(
+                "return document.querySelectorAll('." + class_review + "')[" + str(b-1) + "].querySelector('a').innerText"
+            )
 
             # work with name
             for_name = 0
@@ -126,13 +148,22 @@ class ReviewsTwoGis:
                 else:
                     for_name += 1
 
-            print('имя: ' + name_elem.text)
+            review_name = name_elem.text
+
+            review_name = self.browser.driver.execute_script("return document.querySelectorAll"
+                                                             "('." + class_review + "')[" + str(b-1) +
+                                                             "].querySelectorAll('span')[1]"
+                                                             ".innerText")
 
             # work with date
             date_elem = name_elem.find_element(by=By.XPATH, value='./../..') \
                 .find_element(by=By.CSS_SELECTOR, value='div')
 
-            print('дата: ' + date_elem.text)
+            review_date = date_elem.text
+            review_date = self.browser.driver.execute_script("return document.querySelectorAll('." + class_review + "')"
+                                                             "[" + str(b -1) + "].querySelectorAll('span')"
+                                                             "[1].parentElement.parentElement"
+                                                             ".querySelector('div').innerText")
 
             # work with rating
             class_parent_rating = name_elem.find_element(by=By.XPATH, value='./../../../..') \
@@ -146,13 +177,17 @@ class ReviewsTwoGis:
                                                         ".children.item(0).children.item(0)"
                                                         ".querySelectorAll('span').length")
 
-            print(rating)
+            review_rating = rating
 
             # work with response
             length_response = self.browser.driver.execute_script("return document.querySelectorAll"
                                                                  "('." + class_review + "')"
                                                                  "[" + str(b - 1) + "].children.item(2)"
                                                                  ".children.length")
+
+            # init company response
+            review_response = None
+            review_response_text = None
 
             if int(length_response) > 2:
                 company_response = self.browser.driver.execute_script("return document.querySelectorAll"
@@ -168,9 +203,16 @@ class ReviewsTwoGis:
                                                                    ".children.item(0).children"
                                                                    ".item(2).innerText")
 
-                print('название компании: ' + company_response)
-                print('текст ответа: ' + text_response)
+                review_response = company_response
+                review_response_text = text_response
 
             b += 1
+            reviews.append({
+                'author': review_name,
+                'rating': review_rating,
+                'date': review_date,
+                'text': review_text,
+                'answer': review_response_text
+            })
 
-        return self.review_class
+        return reviews
