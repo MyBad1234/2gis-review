@@ -82,7 +82,7 @@ def run():
 
     if sql:
         sql, queue = query_sql.getFindFilialQueue(sql, query_sql.TYPE['find_two_gis_reviews_in_filial'])
-        # queue = {'queue_id': 3177, 'resource_id': 3682}
+        # queue = {'queue_id': 3186, 'resource_id': 2965}
 
         if queue:
             id_filial = queue.get('resource_id')
@@ -164,4 +164,3 @@ if __name__ == '__main__1':
 if __name__ == '__main__':
     while True:
         run()
-
