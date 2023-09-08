@@ -13,7 +13,7 @@ def get_all_reviews(work_browser: Browser):
     count_reviews = reviews_obj.get_count_reviews()
 
     # scroll reviews
-    reviews_obj.scroll_reviews()
+    reviews_obj.scroll_reviews(count_reviews)
 
     # get class of reviews
     review_class = reviews_obj.get_class_review(count_reviews)
@@ -32,7 +32,7 @@ def get_some_reviews(work_browser: Browser):
     count_reviews = reviews_obj.get_count_reviews()
 
     # scroll reviews
-    reviews_obj.scroll_reviews()
+    reviews_obj.scroll_reviews(count_reviews)
 
     # get class of reviews
     review_class = reviews_obj.get_class_review(count_reviews)
@@ -54,7 +54,7 @@ def work_with_browser(browser_obj):
     count_reviews = reviews_obj.get_count_reviews()
 
     # scroll reviews
-    reviews_obj.scroll_reviews()
+    reviews_obj.scroll_reviews(count_reviews)
 
     # get class of reviews
     review_class = reviews_obj.get_class_review(count_reviews)
@@ -69,7 +69,7 @@ def load_page(yandex_url, proxy: dict, repeat: bool):
     browser = Browser('window')
 
     # go to page
-    browser.driver.get(yandex_url)
+    browser.driver.get(yandex_url + '/tab/reviews')
     time.sleep(5)
 
     # control repeat and get reviews

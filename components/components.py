@@ -1,5 +1,6 @@
 import time
 
+import selenium.common.exceptions
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -86,7 +87,7 @@ class ReviewsTwoGis:
 
         return class_review
 
-    def scroll_reviews(self):
+    def scroll_reviews(self, count_review):
         """scroll all reviews for get it"""
 
         # scroll to start
@@ -106,7 +107,7 @@ class ReviewsTwoGis:
 
         self.browser.driver.execute_script(scroll_script)
 
-        time.sleep(3)
+        time.sleep(count_review / 10 + 1)
 
         # scroll to the end
         scroll_script = ("let a; for (let i of document.querySelectorAll('a')) {"
@@ -190,18 +191,36 @@ class ReviewsTwoGis:
             review_response_text = None
 
             if int(length_response) > 2:
-                company_response = self.browser.driver.execute_script("return document.querySelectorAll"
-                                                                      "('." + class_review + "')"
-                                                                      "[" + str(b - 1) + "].children"
-                                                                      ".item(2).children[2]"
-                                                                      ".querySelector('span').innerText")
+                try:
+                    company_response = self.browser.driver.execute_script("return document.querySelectorAll"
+                                                                          "('." + class_review + "')"
+                                                                          "[" + str(b - 1) + "].children"
+                                                                          ".item(2).children[2]"
+                                                                          ".querySelector('span').innerText")
 
-                text_response = self.browser.driver.execute_script("return document.querySelectorAll"
-                                                                   "('." + class_review + "')"
-                                                                   "[" + str(b - 1) + "].children"
-                                                                   ".item(2).children.item(2)"
-                                                                   ".children.item(0).children"
-                                                                   ".item(2).innerText")
+                except selenium.common.exceptions.JavascriptException:
+                    company_response = self.browser.driver.execute_script("return document.querySelectorAll"
+                                                                          "('." + class_review + "')"
+                                                                          "[" + str(b - 1) + "].children"
+                                                                          ".item(2).children[3]"
+                                                                          ".querySelector('span').innerText")
+
+                try:
+                    text_response = self.browser.driver.execute_script("return document.querySelectorAll"
+                                                                       "('." + class_review + "')"
+                                                                       "[" + str(b - 1) + "].children"
+                                                                       ".item(2).children.item(2)"
+                                                                       ".children.item(0).children"
+                                                                       ".item(2).innerText")
+
+                except selenium.common.exceptions.JavascriptException:
+                    text_response = self.browser.driver.execute_script("return document.querySelectorAll"
+                                                                       "('." + class_review + "')"
+                                                                       "[" + str(b - 1) + "].children"
+                                                                       ".item(2).children.item(3)"
+                                                                       ".children.item(0).children"
+                                                                       ".item(2).innerText")
+
 
                 review_response = company_response
                 review_response_text = text_response

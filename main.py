@@ -53,7 +53,7 @@ def work_with_browser(browser_obj: Browser):
     count_reviews = reviews_obj.get_count_reviews()
 
     # scroll reviews
-    reviews_obj.scroll_reviews()
+    reviews_obj.scroll_reviews(count_reviews)
 
     # get class of reviews
     review_class = reviews_obj.get_class_review(count_reviews)
@@ -76,13 +76,13 @@ def run():
 
         return
 
-    yandex_url = None
+    two_gis_url = None
     organization = None
     id_filial = None
 
     if sql:
         sql, queue = query_sql.getFindFilialQueue(sql, query_sql.TYPE['find_two_gis_reviews_in_filial'])
-        # queue = {'queue_id': 8, 'resource_id': 2965}
+        # queue = {'queue_id': 3177, 'resource_id': 3682}
 
         if queue:
             id_filial = queue.get('resource_id')
@@ -112,6 +112,7 @@ def run():
                         # control count of reviews
                         sql = query_sql.control_count_json(sql, queue['queue_id'])
                     else:
+                        print('Нет результата')
                         sql = query_sql.statusError(sql, queue['queue_id'], 'Не получена результат')
                 else:
                     print('Нет URL филиала')
@@ -133,7 +134,7 @@ def run():
                     query_sql.statusError(sql, queue['queue_id'], error_text)
 
                 # send message
-                send_message_tg(dt_now, yandex_url, id_filial, organization)
+                send_message_tg(dt_now, two_gis_url, id_filial, organization)
 
         else:
             print('пауза')
