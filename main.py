@@ -40,27 +40,6 @@ def send_message_tg(datetime_work, company_yandex_url, filial_id, company_name):
                   json={"chat_id": chat, "text": row_tg})
 
 
-def work_with_browser(browser_obj: Browser):
-    """use methods ReviewsTwoGis"""
-
-    # get reviews
-    reviews_obj = ReviewsTwoGis(browser_obj)
-
-    btn = reviews_obj.get_reviews_btn()
-    btn.click()
-
-    # get count of reviews
-    count_reviews = reviews_obj.get_count_reviews()
-
-    # scroll reviews
-    reviews_obj.scroll_reviews(count_reviews)
-
-    # get class of reviews
-    review_class = reviews_obj.get_class_review(count_reviews)
-
-    # get class of review
-    reviews_obj.get_reviews(review_class)
-
 
 def run():
     print('it is start')
@@ -82,7 +61,7 @@ def run():
 
     if sql:
         sql, queue = query_sql.getFindFilialQueue(sql, query_sql.TYPE['find_two_gis_reviews_in_filial'])
-        # queue = {'queue_id': 3186, 'resource_id': 2965}
+        # queue = {'queue_id': 3290, 'resource_id': 3657}
 
         if queue:
             id_filial = queue.get('resource_id')
@@ -92,7 +71,7 @@ def run():
                 sql, proxy_dict = query_sql.get_proxy(sql)
 
                 # Если есть задача - присваиваем статус "в работе"
-                # sql = query_sql.statusInProcess(sql, queue['queue_id'])
+                sql = query_sql.statusInProcess(sql, queue['queue_id'])
                 sql, two_gis_url, organization = query_sql.getYandexUrl(sql, queue['resource_id'])
 
                 if two_gis_url:
@@ -101,13 +80,18 @@ def run():
 
                     # Получаем страницу
                     result = parser.load_page(two_gis_url, {'ip': proxy_dict[0], 'port': '1050'}, control_repeat)
+
                     if result:
+                        # make json format
+                        json_string = json.dumps(result, ensure_ascii=False)
+
+                        # save result
                         sql = query_sql.statusDone(sql, queue['queue_id'])
                         # Получаем id записи результата
-                        sql, result_id = query_sql.add_result(sql, queue['queue_id'], result)
+                        sql, result_id = query_sql.add_result(sql, queue['queue_id'], json_string)
                         # Создаём задачу на сохранение отзывов
                         sql, result_id = query_sql.newSaveFilialQueue(sql, entity_id=queue['resource_id'],
-                                                                              resource_id=result_id)
+                                                                      resource_id=result_id)
 
                         # control count of reviews
                         sql = query_sql.control_count_json(sql, queue['queue_id'])
@@ -144,21 +128,6 @@ def run():
             sql.close()
         except pymysql.err.Error:
             pass
-
-
-if __name__ == '__main__1':
-    # get id of firm
-    firm_id = input()
-
-    # go to page
-    browser = Browser(mode='window')
-    browser.driver.get('https://2gis.ru/firm/' + firm_id)
-
-    # work with browser
-    work_with_browser(browser)
-
-    # quit from browser
-    browser.driver.quit()
 
 
 if __name__ == '__main__':

@@ -150,55 +150,39 @@ def insert_query(sql: pymysql.connections.Connection, query: str, attempt=0, clo
 
 
 def add_result(sql, queue_id, data_json):
-    """Добавить результат (Боря)"""
+    """set result to db"""
 
-    # connect to db from sqlalchemy
-    connect_str = ("mysql+pymysql://" + DB_LOGIN + ":" + DB_PASS + "@"
-                   + DB_HOST + "/" + DB_NAME)
+    # control repeat
+    query = "SELECT * FROM queue_2gis_reviews_in_filial WHERE JSON_CONTAINS(data, %s)"
 
-    engine = sqlalchemy.create_engine(connect_str, echo=True)
+    # test
+    sql = checkConnect(sql)
+    with sql.cursor() as cursor:
+        cursor.execute(query, (data_json,))
+        data = cursor.fetchone()
 
-    # model for db
-    metadata_obj = sqlalchemy.MetaData()
-    data_model = sqlalchemy.Table(
-        'queue_2gis_reviews_in_filial',
-        metadata_obj,
-        sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),
-        sqlalchemy.Column('queue_id', sqlalchemy.Integer),
-        sqlalchemy.Column('data', sqlalchemy.JSON, nullable=True)
-    )
+        # save changes in db
+        sql.commit()
 
-    with engine.connect() as conn:
-        # push data to db(get id)
-        query = sqlalchemy.insert(data_model).values(queue_id=queue_id, data=data_json)
+    if data is None:
+        repeat = False
+    else:
+        repeat = True
 
-        result = conn.execute(query)
-        conn.commit()
+    # set db
+    query = "INSERT INTO queue_2gis_reviews_in_filial (queue_id, data) VALUES (%s, %s)"
 
-        print(result.inserted_primary_key[0])
+    sql = checkConnect(sql)
+    with sql.cursor() as cursor:
+        if repeat:
+            cursor.execute(query, (queue_id, None))
+        else:
+            cursor.execute(query, (queue_id, data_json))
 
-        # work with data
-        query = sqlalchemy.select(data_model).where(data_model.c.id == result.inserted_primary_key[0])
-        for i in conn.execute(query):
-            inserted_data = i[2]
+        sql.commit()
+        update_id = cursor.lastrowid
 
-        query = sqlalchemy.select(data_model).where(data_model.c.id != result.inserted_primary_key[0])
-
-        for_duplicate = False
-        for i in conn.execute(query):
-            if inserted_data == i[2]:
-                for_duplicate = True
-
-        # update the data if there is a duplicate
-        if for_duplicate:
-            query = sqlalchemy.update(data_model).where(data_model.c.id == result.inserted_primary_key[0]) \
-                .values(data=None)
-
-            conn.execute(query)
-            conn.commit()
-            print('hz')
-
-    return sql, result.inserted_primary_key[0]
+    return sql, update_id
 
 
 def set_value(sql, table, column, value, where):

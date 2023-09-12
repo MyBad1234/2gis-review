@@ -13,7 +13,7 @@ def get_all_reviews(work_browser: Browser):
     count_reviews = reviews_obj.get_count_reviews()
 
     # scroll reviews
-    reviews_obj.scroll_reviews(count_reviews)
+    reviews_obj.scroll_reviews(count_reviews) # сделать тут перенос класса
 
     # get class of reviews
     review_class = reviews_obj.get_class_review(count_reviews)
@@ -41,35 +41,14 @@ def get_some_reviews(work_browser: Browser):
     return reviews_obj.get_reviews(review_class, repeat=True)
 
 
-def work_with_browser(browser_obj):
-    """use methods ReviewsTwoGis"""
-
-    # get reviews
-    reviews_obj = ReviewsTwoGis(browser_obj)
-
-    btn = reviews_obj.get_reviews_btn()
-    btn.click()
-
-    # get count of reviews
-    count_reviews = reviews_obj.get_count_reviews()
-
-    # scroll reviews
-    reviews_obj.scroll_reviews(count_reviews)
-
-    # get class of reviews
-    review_class = reviews_obj.get_class_review(count_reviews)
-
-    # get class of review
-    reviews_obj.get_reviews(review_class)
-
-
 def load_page(yandex_url, proxy: dict, repeat: bool):
     """go to page"""
 
-    browser = Browser('window')
+    browser = Browser('window', proxy)
 
     # go to page
     browser.driver.get(yandex_url + '/tab/reviews')
+    # browser.driver.get('https://2gis.ru/voronezh/firm/4363390419993111/39.185236%2C51.655844/tab/reviews?m=39.188158%2C51.6563%2F16.78')
     time.sleep(5)
 
     # control repeat and get reviews

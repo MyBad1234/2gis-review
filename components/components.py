@@ -14,13 +14,13 @@ class Browser:
     company_found: bool
     in_windows: bool
 
-    def __init__(self, mode: str):
+    def __init__(self, mode: str, proxy: dict):
         if mode == 'window':
             options = webdriver.ChromeOptions()
 
             # set proxy
-            # proxy_str = proxy.get('ip') + ':' + proxy.get('port')
-            # options.add_argument('--proxy-server=%s' % proxy_str)
+            proxy_str = proxy.get('ip') + ':' + proxy.get('port')
+            options.add_argument('--proxy-server=%s' % proxy_str)
 
             self.driver = webdriver.Chrome(options=options)
             self.in_windows = True
@@ -85,7 +85,7 @@ class ReviewsTwoGis:
                                                           "." + class_parent + "')"
                                                           ".children.length - 1).children.length - 1).className")
 
-        return class_review
+        return '_11gvyqv'
 
     def scroll_reviews(self, count_review):
         """scroll all reviews for get it"""
@@ -129,7 +129,7 @@ class ReviewsTwoGis:
         b = 1
         for i in tags:
             # control repeat or no
-            if repeat and (i == 31):
+            if repeat and (b == 31):
                 break
 
             a = i.find_element(by=By.CSS_SELECTOR, value='a')
