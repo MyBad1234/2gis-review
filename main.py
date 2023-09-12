@@ -94,7 +94,7 @@ def run():
                                                                       resource_id=result_id)
 
                         # control count of reviews
-                        sql = query_sql.control_count_json(sql, queue['queue_id'])
+                        # sql = query_sql.control_count_json(sql, queue['queue_id'])
                     else:
                         print('Нет результата')
                         sql = query_sql.statusError(sql, queue['queue_id'], 'Не получена результат')
