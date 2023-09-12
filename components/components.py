@@ -70,6 +70,7 @@ class ReviewsTwoGis:
 
         time.sleep(count_review / 10 + 1)
 
+        '''
         scroll_elem = self.browser.driver.find_element(
             by=By.PARTIAL_LINK_TEXT,
             value='Отзывы'
@@ -84,6 +85,8 @@ class ReviewsTwoGis:
                                                           ".children.item(document.querySelector('"
                                                           "." + class_parent + "')"
                                                           ".children.length - 1).children.length - 1).className")
+                                                          
+        '''
 
         return '_11gvyqv'
 
