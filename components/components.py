@@ -120,6 +120,29 @@ class ReviewsTwoGis:
 
         self.browser.driver.execute_script(scroll_script)
 
+        # get response from company
+        getting_script = "for (let i of document.querySelectorAll('._j1il10')) { i.click()}"
+        self.browser.driver.execute_script(getting_script)
+
+    def is_response(self, class_review, number):
+        """it is response from company or no"""
+
+        try:
+            inner_test = self.browser.driver.execute_script("return document.querySelectorAll"
+                                                            "('." + class_review + "')"
+                                                            "[" + str(number) + "].children"
+                                                            ".item(2).children[2]"
+                                                            ".children.item(0).children.item(1)"
+                                                            ".children.item(1).innerText")
+
+        except selenium.common.exceptions.JavascriptException:
+            return False
+
+        if 'официальный ответ' in inner_test:
+            return True
+
+        return False
+
     def get_reviews(self, class_review, repeat=False):
         """print all reviews"""
 
@@ -193,7 +216,8 @@ class ReviewsTwoGis:
             review_response = None
             review_response_text = None
 
-            if int(length_response) > 2:
+            if (int(length_response) > 2) and self.is_response(class_review, b - 1):
+                answer = True
                 try:
                     company_response = self.browser.driver.execute_script("return document.querySelectorAll"
                                                                           "('." + class_review + "')"
@@ -228,13 +252,17 @@ class ReviewsTwoGis:
                 review_response = company_response
                 review_response_text = text_response
 
+            else:
+                answer = False
+
             b += 1
             reviews.append({
                 'author': review_name,
                 'rating': review_rating,
                 'date': review_date,
                 'text': review_text,
-                'answer': review_response_text
+                'answer_text': review_response_text,
+                'answer': answer
             })
 
         return reviews
