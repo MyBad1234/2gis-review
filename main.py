@@ -40,7 +40,6 @@ def send_message_tg(datetime_work, company_yandex_url, filial_id, company_name):
                   json={"chat_id": chat, "text": row_tg})
 
 
-
 def run():
     print('it is start')
     dt_now = datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S')
@@ -130,6 +129,4 @@ def run():
             pass
 
 
-if __name__ == '__main__':
-    while True:
-        run()
+run()

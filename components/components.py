@@ -63,7 +63,10 @@ class ReviewsTwoGis:
             value='Отзывы'
         ).text
 
-        return int(count[6:])
+        try:
+            return int(count[6:])
+        except ValueError:
+            return 0
 
     def get_class_review(self, count_review):
         """get class of review"""
