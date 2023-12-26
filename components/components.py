@@ -19,8 +19,8 @@ class Browser:
             options = webdriver.ChromeOptions()
 
             # set proxy
-            # proxy_str = proxy.get('ip') + ':' + proxy.get('port')
-            # options.add_argument('--proxy-server=%s' % proxy_str)
+            proxy_str = proxy.get('ip') + ':' + proxy.get('port')
+            options.add_argument('--proxy-server=%s' % proxy_str)
 
             self.driver = webdriver.Chrome(options=options)
             self.in_windows = True
