@@ -19,8 +19,8 @@ class Browser:
             options = webdriver.ChromeOptions()
 
             # set proxy
-            proxy_str = proxy.get('ip') + ':' + proxy.get('port')
-            options.add_argument('--proxy-server=%s' % proxy_str)
+            # proxy_str = proxy.get('ip') + ':' + proxy.get('port')
+            # options.add_argument('--proxy-server=%s' % proxy_str)
 
             self.driver = webdriver.Chrome(options=options)
             self.in_windows = True
@@ -48,6 +48,15 @@ class ReviewsTwoGis:
     def __init__(self, browser: Browser):
         self.browser = browser
         time.sleep(1)
+
+    @staticmethod
+    def get_date_without_data(word: str) -> str:
+        """get date str without other data"""
+
+        if 'отредактирован' in word:
+            word = word.replace(', отредактирован', '')
+
+        return word
 
     def get_reviews_btn(self):
         """get btn for click"""
@@ -251,7 +260,6 @@ class ReviewsTwoGis:
                                                                        ".children.item(0).children"
                                                                        ".item(2).innerText")
 
-
                 review_response = company_response
                 review_response_text = text_response
 
@@ -262,7 +270,7 @@ class ReviewsTwoGis:
             reviews.append({
                 'author': review_name,
                 'rating': review_rating,
-                'date': review_date,
+                'date': ReviewsTwoGis.get_date_without_data(review_date),
                 'text': review_text,
                 'answer_text': review_response_text,
                 'answer': answer

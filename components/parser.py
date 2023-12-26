@@ -53,7 +53,7 @@ def load_page(yandex_url, proxy: dict, repeat: bool):
 
     # control repeat and get reviews
 
-    if repeat:
+    if not repeat:
         reviews = get_some_reviews(browser)
     else:
         reviews = get_all_reviews(browser)

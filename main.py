@@ -96,7 +96,7 @@ def run():
                         # sql = query_sql.control_count_json(sql, queue['queue_id'])
                     else:
                         print('Нет результата')
-                        sql = query_sql.statusError(sql, queue['queue_id'], 'Не получена результат')
+                        sql = query_sql.statusDone(sql, queue['queue_id'])
                 else:
                     print('Нет URL филиала')
                     sql = query_sql.statusError(sql, queue['queue_id'], 'Нет URL филиала')
